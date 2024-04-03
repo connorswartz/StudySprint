@@ -1,24 +1,19 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import HomePage from './Pages/HomePage';
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import HomePage from "./Pages/HomePage";
+import LoginPage from "./Pages/LoginPage";
+import RegisterPage from "./Pages/RegisterPage";
 
 export default function App() {
-  return (
-    <div>
-      <BrowserRouter>
-        <nav>
-          <ul>
-            <li>
-              {/* Link to the home page */}
-              <Link to="/homepage" style={{ color: 'blue', textDecoration: 'none', padding: '10px' }}>Home</Link>
-            </li>
-            {/* Add more <li> tags with <Link> components for additional navigation options */}
-          </ul>
-        </nav>
-        <Routes>
-          <Route index element={<HomePage />} />
-          <Route path='/homepage' element={<HomePage />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
-  );
+	return (
+		<div>
+			<BrowserRouter>
+				<Routes>
+					<Route index element={<HomePage />} />
+					<Route path="/homepage" element={<HomePage />} />
+					<Route path="/login" element={<LoginPage />} />
+					<Route path="/register" element={<RegisterPage />} />
+				</Routes>
+			</BrowserRouter>
+		</div>
+	);
 }
