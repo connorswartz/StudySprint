@@ -1,0 +1,28 @@
+# Version control
+.git
+.gitignore
+
+# Build artifacts
+node_modules
+dist
+build
+
+# Log files
+*.log
+
+# Editor files
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# Other files and directories not needed for the build
+*.md
+*.txt
+docs
+tests
