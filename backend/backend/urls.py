@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 from api import views
+from api.views import login_view, register_view
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
@@ -32,6 +33,8 @@ router.register(r'has', views.HasViewSet)
 router.register(r'performance-reports', views.PerformanceReportViewSet)
 
 urlpatterns = [
-    path('', views.home, name='home'),  # Add this line
+    path('', views.home, name='home'), 
     path('api/', include(router.urls)),
+    path('api/login/', login_view, name='login'),
+    path('api/register/', register_view, name='register'),
 ]

@@ -1,12 +1,39 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
-# Create your models here.
+class UserManager(BaseUserManager):
+    def create_user(self, username, email, password=None, **extra_fields):
+        if not username:
+            raise ValueError('The Username field must be set')
+        if not email:
+            raise ValueError('The Email field must be set')
 
-class User(models.Model):
+        user = self.model(
+            username=username,
+            email=self.normalize_email(email),
+            **extra_fields
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+class User(AbstractBaseUser):
     user_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
+    username = models.CharField(max_length=100, unique=True)
+    email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)
+
+    last_login = None  # This attempts to negate the default field from AbstractBaseUser
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    objects = UserManager()
+
+    def __str__(self):
+        return self.username
+
+
 
 class Parent(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
