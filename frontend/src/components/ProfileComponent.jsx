@@ -12,6 +12,15 @@ const ProfileComponent = ({ currentUser, onUpdate }) => {
     onUpdate({ type: 'password', value: newPassword });
   };
 
+  const handleLogout = () => {
+    // Clear user authentication data from local storage or cookies
+    localStorage.removeItem('token'); // If you're using token-based authentication
+    // Clear any other auth-related data or state
+
+    // Redirect to login page
+    navigate('/login');
+  };
+
   // Define the styles inline as per the design in the screenshot
   const styles = {
     container: {
