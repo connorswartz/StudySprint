@@ -3,8 +3,15 @@ import { Bar } from 'react-chartjs-2';
 import PerformanceReport from "../components/PerformanceReport";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import axios from 'axios';
+import NavigationBar from "../components/NavigationBar";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+const navItems = [
+    { id: 'Profile', label: 'Profile', path: '/profilepage' },
+    { id: 'Home', label: 'Home', path: '/homepage' },
+    { id: 'Report', label: 'Report', path: '/performancereport' }
+  ];
 
 const PerformanceReportPage = () => {
   const [reportData, setReportData] = useState({
@@ -42,6 +49,7 @@ const PerformanceReportPage = () => {
         <h1 className="text-lg font-semibold text-center mb-4">Performance Report</h1>
         <Bar data={reportData} options={{ responsive: true, maintainAspectRatio: true }} />
       </div>
+      <NavigationBar navItems={navItems} />
     </main>
   );
 };
