@@ -1,24 +1,61 @@
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
-import { Card, CardBody, Button, Modal } from "@nextui-org/react";
-import React, { useState, useEffect } from "react";
-import TimerSettingsModal from "./TimerSettingsModal";
-
-// import TimerSettingsModal from "./TimerSettingsModal";
+import { Card, CardBody, Button, Modal, ModalBody, ModalHeader } from "@nextui-org/react";
+import React, { useState } from "react";
 
 const TimerCard = () => {
-	const [isPlaying, setIsPlaying] = useState(false);
-	const [duration, setDuration] = useState(60);
-	const [showModal, setShowModal] = useState(false);
-	const [completedSessions, setCompletedSessions] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(60);
+  const [showModal, setShowModal] = useState(false);
+  const [completedSessions, setCompletedSessions] = useState(0);
 
-	// function for backend sending completed sessions
+  const handleTimerComplete = () => {
+    setCompletedSessions(completedSessions + 1);
+  };
 
-	const handleTimerComplete = () => {
-		setCompletedSessions(completedSessions + 1);
-	};
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
-	return (
-		<Card className="flex-1" style={{ flexGrow: 1.7 }}>
+  const handleIncrement = () => {
+    setDuration(duration + 60);
+  };
+
+  const handleDecrement = () => {
+    if (duration > 60) {
+      setDuration(duration - 60);
+    }
+  };
+
+  const renderModal = () => (
+    <Modal
+      blur
+      closeButton
+      preventClose
+      aria-labelledby="modal-title"
+      open={showModal}
+      onClose={handleCloseModal}
+    >
+      <ModalHeader>
+        <h1 id="modal-title" size={18}>
+          Timer Settings
+        </h1>
+      </ModalHeader>
+      <ModalBody>
+        <Card>
+          <Card.Body>
+            <h1>Duration: {duration / 60} minutes</h1>
+            <div className="flex justify-center gap-4 mt-4">
+              <Button onClick={handleDecrement}>-</Button>
+              <Button onClick={handleIncrement}>+</Button>
+            </div>
+          </Card.Body>
+        </Card>
+      </ModalBody>
+    </Modal>
+  );
+
+  return (
+    <Card className="flex-1" style={{ flexGrow: 1.7 }}>
       <CardBody className="items-center">
         <h1 className="text-center text-large mb-11">Timer Card</h1>
         <CountdownCircleTimer
@@ -41,14 +78,9 @@ const TimerCard = () => {
           <Button onClick={() => setShowModal(true)}>Settings</Button>
         </div>
       </CardBody>
-      <TimerSettingsModal
-        visible={showModal}
-        closeHandler={() => setShowModal(false)}
-        duration={duration}
-        setDuration={setDuration}
-      />
+      {showModal && renderModal()}
     </Card>
-	);
+  );
 };
 
 export default TimerCard;
