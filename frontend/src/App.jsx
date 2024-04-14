@@ -4,6 +4,7 @@ import LoginPage from "./Pages/LoginPage";
 import RegisterPage from "./Pages/RegisterPage";
 import PerformanceReportPage from "./Pages/PerformanceReportPage";
 import ProfilePage from "./Pages/ProfilePage";
+// 
 
 export default function App() {
 	return (
