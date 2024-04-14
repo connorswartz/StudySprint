@@ -19,37 +19,36 @@ def login_view(request):
 
 @api_view(['POST'])
 def register_view(request):
-    try:
-        username = request.data.get('username')
-        email = request.data.get('email')
-        password = request.data.get('password')
-        account_type = request.data.get('accountType')
-        parent_username = request.data.get('parentUsername')
-
-        # Check if the username or email is already registered
-        if User.objects.filter(username=username).exists():
-            return Response({'success': False, 'message': 'Username already exists'}, status=400)
-        if User.objects.filter(email=email).exists():
-            return Response({'success': False, 'message': 'Email already registered'}, status=400)
-
-        # Create a new user
-        user = User.objects.create_user(username=username, email=email, password=password)
-
-        if account_type == 'child':
-            # Check if the parent user exists
-            try:
-                parent_user = User.objects.get(username=parent_username)
-                parent = Parent.objects.get(user_id=parent_user)
-                Child.objects.create(user_id=user, parent_id=parent)
-            except (User.DoesNotExist, Parent.DoesNotExist):
-                user.delete()  # Delete the created user if the parent doesn't exist
-                return Response({'success': False, 'message': 'Invalid parent username'}, status=400)
-        else:
-            Parent.objects.create(user_id=user)
-
-        return Response({'success': True, 'user_id': user.user_id}, status=201)
-    except Exception as e:
-        return Response({'success': False, 'message': str(e)}, status=500)
+    username = request.data.get('username')
+    email = request.data.get('email')
+    password = request.data.get('password')
+    account_type = request.data.get('accountType')
+    parent_username = request.data.get('parentUsername')
+    
+    # Check if the username or email is already registered
+    if User.objects.filter(username=username).exists():
+        return Response({'success': False, 'message': 'Username already exists'})
+    if User.objects.filter(email=email).exists():
+        return Response({'success': False, 'message': 'Email already registered'})
+    
+    # Create a new user
+    user = User.objects.create(username=username, email=email)
+    user.set_password(password)
+    user.save()
+    
+    if account_type == 'child':
+        # Check if the parent user exists
+        try:
+            parent_user = User.objects.get(username=parent_username)
+            parent = Parent.objects.get(user_id=parent_user)
+            Child.objects.create(user_id=user, parent_id=parent)
+        except (User.DoesNotExist, Parent.DoesNotExist):
+            user.delete()  # Delete the created user if the parent doesn't exist
+            return Response({'success': False, 'message': 'Invalid parent username'})
+    else:
+        Parent.objects.create(user_id=user)
+    
+    return Response({'success': True, 'user_id': user.user_id})
 
 def home(request):
     return render(request, 'home.html') # Add this function
