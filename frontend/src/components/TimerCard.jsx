@@ -1,6 +1,9 @@
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import { Card, CardBody, Button, Modal } from "@nextui-org/react";
 import React, { useState, useEffect } from "react";
+import TimerSettingsModal from "./TimerSettingsModal";
+
+// import TimerSettingsModal from "./TimerSettingsModal";
 
 const TimerCard = () => {
 	const [isPlaying, setIsPlaying] = useState(false);
@@ -16,26 +19,35 @@ const TimerCard = () => {
 
 	return (
 		<Card className="flex-1" style={{ flexGrow: 1.7 }}>
-			<CardBody className="items-center">
-				<h1 className="text-center text-large mb-11">Timer Card</h1>
-				<CountdownCircleTimer
-					size={260}
-					isPlaying={isPlaying}
-					duration={duration}
-					colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
-					colorsTime={[7, 5, 2, 0]}
-					onComplete={handleTimerComplete}
-				>
-					{({ remainingTime }) => remainingTime}
-				</CountdownCircleTimer>
-				<div className="flex justify-center gap-4 mt-4">
-					<Button onPress={() => setIsPlaying(!isPlaying)}>
-						{isPlaying ? "Stop" : "Start"}
-					</Button>
-					<Button onPress={() => setShowModal(true)}>Settings</Button>
-				</div>
-			</CardBody>
-		</Card>
+      <CardBody className="items-center">
+        <h1 className="text-center text-large mb-11">Timer Card</h1>
+        <CountdownCircleTimer
+          size={260}
+          isPlaying={isPlaying}
+          duration={duration}
+          colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
+          colorsTime={[7, 5, 2, 0]}
+          onComplete={handleTimerComplete}
+        >
+          {({ remainingTime }) => remainingTime}
+        </CountdownCircleTimer>
+        <p className="text-center">
+          Make beautiful websites regardless of your design experience.
+        </p>
+        <div className="flex justify-center gap-4 mt-4">
+          <Button onClick={() => setIsPlaying(!isPlaying)}>
+            {isPlaying ? "Stop" : "Start"}
+          </Button>
+          <Button onClick={() => setShowModal(true)}>Settings</Button>
+        </div>
+      </CardBody>
+      <TimerSettingsModal
+        visible={showModal}
+        closeHandler={() => setShowModal(false)}
+        duration={duration}
+        setDuration={setDuration}
+      />
+    </Card>
 	);
 };
 
