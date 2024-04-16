@@ -26,7 +26,8 @@ const HomePage = () => {
 
   return (
     <main className="p-5">
-      <h1 className="text-center text-3xl">StudySprint</h1>
+      <NavigationBar navItems={navItems} />
+      <h1 className="text-center text-3xl mt-16">StudySprint</h1>
       <div className="flex flex-col md:flex-row gap-5 mt-5">
         <TimerCard selectedTask={selectedTask} onTaskUpdate={handleTaskUpdate} />
         <div className="flex flex-col flex-1 gap-5">
@@ -34,7 +35,6 @@ const HomePage = () => {
           <GoalCard />
         </div>
       </div>
-      <NavigationBar navItems={navItems} />
     </main>
   );
 };

@@ -21,7 +21,6 @@ const ProfilePage = () => {
         console.error('Error fetching current user:', error);
       }
     };
-
     fetchCurrentUser();
   }, []);
 
@@ -52,14 +51,16 @@ const ProfilePage = () => {
 
   return (
     <div>
-      {currentUser && (
-        <ProfileComponent
-          currentUser={currentUser}
-          onUpdate={handleUpdate}
-          onLogout={handleLogout}
-        />
-      )}
       <NavigationBar navItems={navItems} />
+      <div style={{ marginTop: '60px' }}>
+        {currentUser && (
+          <ProfileComponent
+            currentUser={currentUser}
+            onUpdate={handleUpdate}
+            onLogout={handleLogout}
+          />
+        )}
+      </div>
     </div>
   );
 };

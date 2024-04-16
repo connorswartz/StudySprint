@@ -77,7 +77,7 @@ const GoalCard = () => {
             onClick={handleDecrement}
             size="sm"
             light
-            style={{ backgroundColor: "#8B0000", borderRadius: "50%", height: "60px", display: "flex", justifyContent: "center", alignItems: "center" }}
+            style={{ backgroundColor: "#8B0000", borderRadius: "50%", height: "60px", display: "flex", justifyContent: "center", alignItems: "center", fontSize: "25px" }}
           >
             -
           </Button>
@@ -86,13 +86,13 @@ const GoalCard = () => {
             onClick={handleIncrement}
             size="sm"
             light
-            style={{ backgroundColor: "#004777", borderRadius: "50%", height: "60px", display: "flex", justifyContent: "center", alignItems: "center" }}
+            style={{ backgroundColor: "#004777", borderRadius: "50%", height: "60px", display: "flex", justifyContent: "center", alignItems: "center", fontSize: "25px" }}
           >
             +
           </Button>
         </div>
         <div style={{ display: "flex", justifyContent: "center", marginTop: "24px", marginBottom: "32px" }}>
-          <Button onClick={handleGoalSubmit} size="sm">
+          <Button onClick={handleGoalSubmit} size="md">
             Set Goal
           </Button>
         </div>
