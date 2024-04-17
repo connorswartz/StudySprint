@@ -1,3 +1,5 @@
+Instructions for running:
+
 1. Make sure python is installed in project. This can be done with homebrew: brew install python
 2. Activate virtual environment: source env/bin/activate (macOS or Linux, this step can be skipped on Windows)
 3. Install django. This can be done using pip: pip install django
