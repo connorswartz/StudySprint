@@ -17,12 +17,14 @@ Instructions for running:
 1. Make sure python is installed in project. This can be done with homebrew: brew install python
 2. Activate virtual environment: source env/bin/activate (macOS or Linux, this step can be skipped on Windows)
 3. Install django. This can be done using pip: pip install django
-4. open two different terminal windows — in one window, do change directory to backend: cd backend/, in the other change
+4. Install Django cors-headers. run: pip install django-cors-headers
+5. Install Django Rest Framework. run: pip install djangorestframework
+6. open two different terminal windows — in one window, do change directory to backend: cd backend/, in the other change
 directory to frontend: cd frontend/
-5. In backend directory:
+7. In backend directory:
    - run: python manage.py makemigrations
    - run: python manage.py migrate
    - run: python manage.py runserver
-6. In frontend directory:
+8. In frontend directory:
    - run: npm install
    - run: npm run dev
