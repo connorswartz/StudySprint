@@ -1,4 +1,4 @@
-Setting up and viewing MySQL server using the command line:
+Setting up and viewing MySQL database using the command line:
 
 1. Install mysql. This can be done using homebrew. run: brew install mysql
 2. Start mysql service. This can be done using homebrew. run: brew services start mysql
