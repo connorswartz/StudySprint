@@ -55,7 +55,7 @@ class Session(models.Model):
     task_id = models.ForeignKey(Task, on_delete=models.CASCADE, default=1)  # Provide a default value for task_id
     starttime = models.IntegerField()  # Store starttime in seconds
     endtime = models.IntegerField() # Store endtime in seconds
-    date = models.DateField(default=timezone.now) 
+    date = models.DateField(default=timezone.now)
 
 class Break(models.Model):
     session_id = models.ForeignKey(Session, on_delete=models.CASCADE)
@@ -69,6 +69,7 @@ class Category(models.Model):
 class Goal(models.Model):
     goal_id = models.AutoField(primary_key=True)
     no_of_minutes = models.IntegerField()
+    completed_minutes = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class Contains(models.Model):
@@ -81,4 +82,7 @@ class Has(models.Model):
 
 class PerformanceReport(models.Model):
     report_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     task_id = models.ForeignKey(Task, on_delete=models.CASCADE)
+    date = models.DateField(default=timezone.now)
+    duration = models.IntegerField(default=0)

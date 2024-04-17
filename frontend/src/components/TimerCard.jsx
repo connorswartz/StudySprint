@@ -21,7 +21,7 @@ const TimerCard = ({ selectedTask, onTaskUpdate }) => {
     } else {
       const endTime = remainingTime - 1;
       try {
-        const userId = localStorage.getItem('userId');
+        const userId = parseInt(localStorage.getItem('userId'));
         const response = await axios.post('http://localhost:8000/api/sessions/', {
           user_id: userId,
           task_id: selectedTask.task_id,
@@ -30,6 +30,7 @@ const TimerCard = ({ selectedTask, onTaskUpdate }) => {
           date: new Date().toISOString().slice(0, 10),
         });
         if (response.status === 201) {
+          console.log("New session created successfully");
           const updatedTaskResponse = await axios.get(`http://localhost:8000/api/tasks/${selectedTask.task_id}/`);
           const updatedTask = updatedTaskResponse.data;
           await axios.patch(`http://localhost:8000/api/tasks/${selectedTask.task_id}/`, {
@@ -41,6 +42,13 @@ const TimerCard = ({ selectedTask, onTaskUpdate }) => {
           setRemainingTime(5 * 60); // Set break duration to 5 minutes
           setKey((prevKey) => prevKey + 1);
           setStartTime(null);
+  
+          // Fetch the latest goal data after adding a new session
+          const goalResponse = await axios.get(`http://localhost:8000/api/goals/?user_id=${userId}`);
+          if (goalResponse.data.length > 0) {
+            const latestGoal = goalResponse.data[goalResponse.data.length - 1];
+            console.log("Latest goal:", latestGoal);
+          }
         }
       } catch (error) {
         console.error('Error updating session and task:', error);

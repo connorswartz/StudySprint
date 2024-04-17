@@ -39,7 +39,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class GoalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goal
-        fields = ['goal_id', 'no_of_minutes', 'user_id']
+        fields = ['goal_id', 'no_of_minutes', 'completed_minutes', 'user_id']
 
 class ContainsSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,11 +1,23 @@
+from argparse import Action
+from datetime import timezone
+from django.utils import timezone
 from django.shortcuts import render
 from rest_framework import viewsets
 from .models import User, Parent, Child, Session, Break, Task, Category, Goal, Contains, Has, PerformanceReport
-from .serializers import UserSerializer, ParentSerializer, ChildSerializer, SessionSerializer, BreakSerializer, TaskSerializer, CategorySerializer, GoalSerializer, ContainsSerializer, HasSerializer, PerformanceReportSerializer
+from api.serializers import UserSerializer, ParentSerializer, ChildSerializer, SessionSerializer, BreakSerializer, TaskSerializer, CategorySerializer, GoalSerializer, ContainsSerializer, HasSerializer, PerformanceReportSerializer
 from django.contrib.auth import authenticate, login
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db import IntegrityError
+from decimal import Decimal
+from django.db.models import Sum
+from django.db.models.functions import TruncDate
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import viewsets
+from django.db.models import F
+from django.db.models.functions import Coalesce
+from datetime import datetime, timedelta
 
 @api_view(['POST'])
 def login_view(request):
@@ -70,6 +82,16 @@ class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user_id = self.request.query_params.get('user_id')
+        date = self.request.query_params.get('date')
+        if user_id is not None:
+            queryset = queryset.filter(user_id=user_id)
+        if date is not None:
+            queryset = queryset.filter(date=date)
+        return queryset
+
     def perform_create(self, serializer):
         # Generate a unique session_id
         session_id = 1
@@ -86,7 +108,26 @@ class SessionViewSet(viewsets.ModelViewSet):
                 session_id += 1
                 continue
 
-        serializer.save(session_id=session_id)
+        session = serializer.save(session_id=session_id)
+        print(f"New session created: {session}")
+
+        # Update the goal's completed minutes
+        user_id = session.user_id.user_id
+        today = timezone.now().date()
+        sessions = Session.objects.filter(user_id=user_id, date=today)
+        print(f"Sessions for user {user_id} on {today}: {sessions}")
+        completed_seconds = sum(session.starttime - session.endtime for session in sessions)
+        print(f"Completed seconds for user {user_id} on {today}: {completed_seconds}")
+        completed_minutes = Decimal(completed_seconds) / Decimal(60)
+        print(f"Completed minutes for user {user_id} on {today}: {completed_minutes}")
+
+        try:
+            goal = Goal.objects.filter(user_id=user_id).latest('goal_id')
+            goal.completed_minutes = completed_minutes
+            goal.save()
+            print(f"Updated goal {goal.goal_id} for user {user_id} with completed minutes: {completed_minutes}")
+        except Goal.DoesNotExist:
+            print(f"No goal found for user {user_id}")
 
 class BreakViewSet(viewsets.ModelViewSet):
     queryset = Break.objects.all()
@@ -118,6 +159,28 @@ class GoalViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(user_id=user_id)
         return queryset
 
+    def perform_create(self, serializer):
+        goal = serializer.save(completed_minutes=0)
+        user_id = goal.user_id.user_id
+        today = timezone.now().date()
+        sessions = Session.objects.filter(user_id=user_id, date=today)
+        completed_seconds = sum(session.starttime - session.endtime for session in sessions)
+        completed_minutes = Decimal(completed_seconds) / Decimal(60)
+        goal.completed_minutes = completed_minutes
+        goal.save()
+
+    def perform_update(self, serializer):
+        user_id = serializer.validated_data['user_id'].user_id
+        today = timezone.now().date()
+        sessions = Session.objects.filter(user_id=user_id, date=today)
+        print(f"Sessions for user {user_id} on {today}: {sessions}")
+        completed_seconds = sum(session.starttime - session.endtime for session in sessions)
+        print(f"Completed seconds for user {user_id} on {today}: {completed_seconds}")
+        completed_minutes = completed_seconds // 60
+        print(f"Completed minutes for user {user_id} on {today}: {completed_minutes}")
+        serializer.save(completed_minutes=completed_minutes)
+        print(f"Updated goal for user {user_id} with completed minutes: {completed_minutes}")
+
 class ContainsViewSet(viewsets.ModelViewSet):
     queryset = Contains.objects.all()
     serializer_class = ContainsSerializer
@@ -129,3 +192,38 @@ class HasViewSet(viewsets.ModelViewSet):
 class PerformanceReportViewSet(viewsets.ModelViewSet):
     queryset = PerformanceReport.objects.all()
     serializer_class = PerformanceReportSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user_id = self.request.query_params.get('user_id')
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        if user_id is not None:
+            queryset = queryset.filter(user_id=user_id)
+        if start_date is not None and end_date is not None:
+            queryset = queryset.filter(date__range=[start_date, end_date])
+        return queryset
+
+    @action(detail=False, methods=['get'])
+    def duration_by_date(self, request):
+        user_id = request.query_params.get('user_id')
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        if user_id is None or start_date is None or end_date is None:
+            return Response({'error': 'user_id, start_date, and end_date are required.'}, status=400)
+
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        durations = []
+        current_date = start_date
+        while current_date <= end_date:
+            sessions = Session.objects.filter(user_id=user_id, date=current_date)
+            total_duration = sessions.aggregate(duration=Coalesce(Sum('starttime') - Sum('endtime'), 0))['duration']
+            durations.append({
+                'date': current_date,
+                'duration': total_duration
+            })
+            current_date += timedelta(days=1)
+
+        return Response(durations)
