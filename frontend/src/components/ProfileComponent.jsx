@@ -1,16 +1,38 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 const ProfileComponent = ({ currentUser, onUpdate, onLogout }) => {
   const [email, setEmail] = useState(currentUser?.email || '');
   const [newPassword, setNewPassword] = useState('');
 
-  const handleEmailChange = () => {
-    onUpdate({ type: 'email', value: email });
+  const handleEmailChange = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        const response = await axios.patch(`http://localhost:8000/api/users/${userId}/update_email/`, { email });
+        if (response.data.success) {
+          onUpdate({ type: 'email', value: email });
+        }
+      }
+    } catch (error) {
+      console.error('Error updating email:', error);
+    }
   };
-
-  const handlePasswordChange = () => {
-    onUpdate({ type: 'password', value: newPassword });
+  
+  const handlePasswordChange = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        const response = await axios.patch(`http://localhost:8000/api/users/${userId}/update_password/`, { password: newPassword });
+        if (response.data.success) {
+          onUpdate({ type: 'password', value: newPassword });
+          setNewPassword('');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating password:', error);
+    }
   };
 
   const styles = {

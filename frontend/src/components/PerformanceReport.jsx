@@ -11,41 +11,40 @@ const PerformanceReport = () => {
   const fetchDurationData = useCallback(async () => {
     console.log('Selected date range:', dateRange);
     try {
-      const userId = localStorage.getItem('userId');
-      const response = await axios.get('http://localhost:8000/api/performance-reports/duration_by_date/', {
-        params: {
-          user_id: userId,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
-        },
-      });
-      console.log('API response data:', response.data);
-      print("test")
-      const durationData = response.data.map(item => ({
-        date: item.date,
-        duration: item.duration / 60, // Convert seconds to minutes
-      }));
-      console.log('Processed duration data:', durationData);
-      setDurationData(durationData);
+        const userId = localStorage.getItem('userId');
+        const response = await axios.get('http://localhost:8000/api/performance-reports/duration_by_date/', {
+            params: {
+                user_id: userId,
+                start_date: dateRange.start,
+                end_date: dateRange.end,
+            },
+        });
+        console.log('API response data:', response.data);
+        const durationData = response.data.map(item => ({
+            date: item.date,
+            duration: item.total_duration / 60, // Convert seconds to minutes
+        }));
+        console.log('Processed duration data:', durationData);
+        setDurationData(durationData);
     } catch (error) {
-      console.error('Error fetching duration data:', error);
+        console.error('Error fetching duration data:', error);
     }
-  }, [dateRange]);
+}, [dateRange]);
 
-  const fetchCompletedSessionsData = useCallback(async () => {
+const fetchCompletedSessionsData = useCallback(async () => {
     try {
-      const userId = localStorage.getItem('userId');
-      const response = await axios.get(`http://localhost:8000/api/tasks/?user_id=${userId}`);
-      const tasks = response.data;
-      const completedSessionsData = tasks.map((task) => ({
-        name: task.name,
-        completedSessions: task.completed_sessions,
-      }));
-      setCompletedSessionsData(completedSessionsData);
+        const userId = localStorage.getItem('userId');
+        const response = await axios.get(`http://localhost:8000/api/tasks/?user_id=${userId}`);
+        const tasks = response.data;
+        const completedSessionsData = tasks.map((task) => ({
+            name: task.name,
+            completedSessions: task.completed_sessions,
+        }));
+        setCompletedSessionsData(completedSessionsData);
     } catch (error) {
-      console.error('Error fetching completed sessions data:', error);
+        console.error('Error fetching completed sessions data:', error);
     }
-  }, []);
+}, []);
 
   useEffect(() => {
     console.log('Date range state changed:', dateRange);
@@ -72,25 +71,6 @@ const PerformanceReport = () => {
 
   return (
     <div>
-      <h2>Performance Report</h2>
-      <div>
-        <label htmlFor="date-range-picker">Select Date Range:</label>
-        <DateRangePicker
-          id="date-range-picker"
-          onChange={handleDateRangeChange}
-          aria-label="Select Date Range"
-        />
-      </div>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={durationData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="duration" fill="#8884d8" />
-        </BarChart>
-      </ResponsiveContainer>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={completedSessionsData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />

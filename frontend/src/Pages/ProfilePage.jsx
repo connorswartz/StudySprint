@@ -27,7 +27,7 @@ const ProfilePage = () => {
   const navItems = [
     { id: 'Profile', label: 'Profile', path: '/profilepage' },
     { id: 'Home', label: 'Home', path: '/homepage' },
-    { id: 'Report', label: 'Report', path: '/performancereport' }
+    { id: 'Report', label: 'Performance Report', path: '/performancereport' }
   ];
 
   const handleLogout = () => {
@@ -39,7 +39,11 @@ const ProfilePage = () => {
     try {
       const userId = localStorage.getItem('userId');
       if (userId) {
-        await axios.patch(`http://localhost:8000/api/users/${userId}/`, updateData);
+        if (updateData.type === 'email') {
+          await axios.patch(`http://localhost:8000/api/users/${userId}/update_email/`, { email: updateData.value });
+        } else if (updateData.type === 'password') {
+          await axios.patch(`http://localhost:8000/api/users/${userId}/update_password/`, { password: updateData.value });
+        }
         // Fetch the updated user data and update the state
         const response = await axios.get(`http://localhost:8000/api/users/${userId}/`);
         setCurrentUser(response.data);

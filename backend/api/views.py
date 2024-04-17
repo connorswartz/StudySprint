@@ -1,6 +1,5 @@
-from argparse import Action
 from datetime import timezone
-from django.utils import timezone
+import datetime
 from django.shortcuts import render
 from rest_framework import viewsets
 from .models import User, Parent, Child, Session, Break, Task, Category, Goal, Contains, Has, PerformanceReport
@@ -11,13 +10,11 @@ from rest_framework.response import Response
 from django.db import IntegrityError
 from decimal import Decimal
 from django.db.models import Sum
-from django.db.models.functions import TruncDate
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.db.models import F
-from django.db.models.functions import Coalesce
-from datetime import datetime, timedelta
+from django.utils import timezone
 
 @api_view(['POST'])
 def login_view(request):
@@ -69,6 +66,26 @@ def home(request):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    @action(detail=True, methods=['patch'])
+    def update_email(self, request, pk=None):
+        user = self.get_object()
+        email = request.data.get('email')
+        if email:
+            user.email = email
+            user.save()
+            return Response({'success': True})
+        return Response({'success': False, 'message': 'Email is required'})
+
+    @action(detail=True, methods=['patch'])
+    def update_password(self, request, pk=None):
+        user = self.get_object()
+        password = request.data.get('password')
+        if password:
+            user.set_password(password)
+            user.save()
+            return Response({'success': True})
+        return Response({'success': False, 'message': 'Password is required'})
 
 class ParentViewSet(viewsets.ModelViewSet):
     queryset = Parent.objects.all()
@@ -209,21 +226,28 @@ class PerformanceReportViewSet(viewsets.ModelViewSet):
         user_id = request.query_params.get('user_id')
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
+
         if user_id is None or start_date is None or end_date is None:
             return Response({'error': 'user_id, start_date, and end_date are required.'}, status=400)
 
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
         end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
 
-        durations = []
-        current_date = start_date
-        while current_date <= end_date:
-            sessions = Session.objects.filter(user_id=user_id, date=current_date)
-            total_duration = sessions.aggregate(duration=Coalesce(Sum('starttime') - Sum('endtime'), 0))['duration']
-            durations.append({
-                'date': current_date,
-                'duration': total_duration
-            })
-            current_date += timedelta(days=1)
+        durations = Session.objects.filter(
+            user_id=user_id,
+            date__range=[start_date, end_date]
+        ).annotate(
+            duration=F('endtime') - F('starttime')
+        ).values('date').annotate(
+            total_duration=Sum('duration')
+        ).values('date', 'total_duration')
 
-        return Response(durations)
+        durations_data = [
+            {
+                'date': duration['date'],
+                'duration': duration['total_duration']
+            }
+            for duration in durations
+        ]
+
+        return Response(durations_data)

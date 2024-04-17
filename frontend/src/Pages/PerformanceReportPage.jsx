@@ -5,7 +5,7 @@ import NavigationBar from "../components/NavigationBar";
 const navItems = [
   { id: 'Profile', label: 'Profile', path: '/profilepage' },
   { id: 'Home', label: 'Home', path: '/homepage' },
-  { id: 'Report', label: 'Report', path: '/performancereport' }
+  { id: 'Report', label: 'Performance Report', path: '/performancereport' }
 ];
 
 const PerformanceReportPage = () => {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 const NavigationBar = ({ navItems }) => {
   const navigate = useNavigate();
   const [hoveredButton, setHoveredButton] = useState(null);

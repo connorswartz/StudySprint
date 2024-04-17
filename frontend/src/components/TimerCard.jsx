@@ -34,9 +34,9 @@ const TimerCard = ({ selectedTask, onTaskUpdate }) => {
           const updatedTaskResponse = await axios.get(`http://localhost:8000/api/tasks/${selectedTask.task_id}/`);
           const updatedTask = updatedTaskResponse.data;
           await axios.patch(`http://localhost:8000/api/tasks/${selectedTask.task_id}/`, {
-            completed_sessions: updatedTask.completed_sessions + 1,
+    completed_sessions: updatedTask.completed_sessions + 1,
           });
-          onTaskUpdate({ ...updatedTask, completed_sessions: updatedTask.completed_sessions + 1 });
+onTaskUpdate({ ...updatedTask, completed_sessions: updatedTask.completed_sessions + 1 });
           setIsBreak(true);
           setIsPlaying(true);
           setRemainingTime(5 * 60); // Set break duration to 5 minutes
