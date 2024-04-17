@@ -82,7 +82,7 @@ class Has(models.Model):
 
 class PerformanceReport(models.Model):
     report_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     task_id = models.ForeignKey(Task, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
     duration = models.IntegerField(default=0)
