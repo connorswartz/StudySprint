@@ -15,7 +15,7 @@ Instructions for running:
 
 1. Make sure python is installed in project. This can be done with homebrew: brew install python
 2. Activate virtual environment: source env/bin/activate (macOS or Linux, this step can be skipped on Windows)
-3. run: pip install -r requirements.txt
+3. run: pip install -r requirements.txt (must do this fron backend directory)
 4. If step 3 did not work:
    - Install django. This can be done using pip: pip install django
    - Install Django cors-headers. run: pip install django-cors-headers
